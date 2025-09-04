@@ -1,1 +1,505 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Typing Speed Test</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  /* Reset & base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background: linear-gradient(90deg, rgba(255,225,0,1) 0%, rgb(0,255,55) 35%, rgba(255,0,200,1) 100%);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Navbar */
+nav {
+  width: 100%;
+  background: linear-gradient(90deg, rgba(255,0,234,1) 1%, rgba(255,255,255,1) 26%, rgba(0,255,55,1) 32%, rgba(255,251,0,1) 74%);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  gap: 10px;
+}
+nav h1 {
+  text-shadow: 10px 2px 10px rgb(0, 0, 0);
+}
+nav img {
+  height: 80px;
+}
+
+/* Page heading */
+h1 {
+  margin: 15px 0;
+  font-size: clamp(24px, 4vw, 40px);
+}
+
+/* Timer */
+#timer {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: bold;
+  margin: 15px 0;
+  color: #ffffff;
+}
+
+/* Passage */
+#text {
+  width: 100%;
+  max-width: 900px;
+  margin: 15px auto;
+  padding: 20px;
+  background: #ffffff;
+  color: #333;
+  border-radius: 12px;
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 1.8;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  height: 140px;
+  overflow-y: auto;
+}
+#text span.correct { color: green; font-weight: 500; }
+#text span.wrong { color: red; font-weight: 500; }
+
+/* Typing input */
+textarea {
+  width: 95%;
+  max-width: 900px;
+  height: 120px;
+  margin: 15px 0;
+  padding: 12px 15px;
+  font-size: clamp(14px, 2vw, 18px);
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  resize: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transition: box-shadow 0.3s;
+}
+textarea:focus {
+  box-shadow: 0 0 10px rgba(255,126,179,0.7);
+}
+
+/* Buttons */
+button {
+  padding: 12px 25px;
+  font-size: clamp(14px, 2vw, 16px);
+  margin: 8px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+  color: white;
+  transition: transform 0.2s, opacity 0.3s;
+}
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+#downloadBtn {
+  margin-top: 20px;
+}
+
+/* Results */
+#result {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #fff;
+}
+
+/* Name input section (centered & prominent) */
+#inputname {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  max-width: 500px;
+  width: 90%;
+}
+
+/* Label / instruction */
+#inputname label {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Text input */
+#inputname input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: 2px solid #764ba2;
+  outline: none;
+  transition: all 0.3s;
+}
+
+#inputname input:focus {
+  border-color: #ff00ea;
+  box-shadow: 0 0 10px rgba(255,0,234,0.5);
+}
+
+/* Submit button */
+#inputname button {
+  padding: 12px 25px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%);
+  color: #fff;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+#inputname button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #inputname label {
+    font-size: 18px;
+  }
+  #inputname input, #inputname button {
+    font-size: 16px;
+  }
+}
+
+
+/* Certificate wrapper (scrollable) */
+#certificateWrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 20px 0;
+  
+ 
+}
+@media (min-width: 1000px) {
+  #certificateWrapper {
+    overflow-x: hidden;   /* no horizontal scroll */
+    display: flex;
+    justify-content: center; /* center horizontally */
+  }
+}
+
+/* Certificate (fixed size) */
+#certificate {
+   
+  padding: 60px;
+ 
+  background-color: white;
+  border-radius: 12px;
+  width: 950px;
+  height: 700px;
+  box-shadow: 0 0 35px rgba(0,0,0,0.2);
+  text-align: center;
+  color: #222;
+  position: relative;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  display: none;
+}
+
+/* Headings */
+#certificate h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: #1e3a8a;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+#certificate h2 {
+  font-family: "Times New Roman", Times, serif; 
+  font-size: 48px;
+  margin: 20px 0;
+  color: #cf0cbf;
+  font-weight: 700;
+}
+#certificate p {
+  font-size: 18px;
+  margin: 12px 0;
+  line-height: 1.6;
+  font-family: "Times New Roman", Times, serif; 
+}
+
+/* Trophy Icon */
+.cert-icon {
+  font-size: 70px;
+  color: #b45309;
+  margin-bottom: 10px;
+}
+
+/* Watermark */
+.cert-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.08;
+  z-index: 0;
+  pointer-events: none;
+}
+.cert-watermark img {
+  max-width: 65%;
+  height: auto;
+}
+
+/* Border */
+#imgborder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+#imgborder img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* Footer */
+.cert-footer {
+   
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding: 0 30px;
+  font-size: 16px;
+ 
+}
+.cert-authimg img {
+  width: 140px;
+  display: block;
+  margin-bottom: 10px;
+}
+.site-name {
+  font-weight: bold;
+  font-size: 18px;
+  color: #1e3a8a;
+  font-family: 'Cinzel', serif;
+}
+.signature img { 
+  width: 160px; 
+  margin-bottom: 5px;
+}
+.signature span {
+  font-size: 16px;
+  color: #333;
+  font-family: 'Georgia', serif;
+}
+
+/* Issued Date */
+.issued-date {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #108d0c;
+  font-style: italic;
+}
+.issued-date span {
+  color: #1e3a8a;
+  font-weight: 800;
+}
+</style>
+</head>
+<body>
+
+<nav>
+   <img src="https://i.ibb.co/JFbFZPY6/20250902-184151.jpg" alt="Website Logo">
+   <h1>Typing Speed Tester</h1>
+</nav>
+
+<h1>Typing Speed Test</h1>
+<div id="timer">60</div>
+
+<p id="text"></p>
+
+<textarea id="input" placeholder="Start typing here after clicking Start..." disabled></textarea>
+<br>
+<button onclick="startTest()">Start Test</button>
+
+ 
+<div id="inputname" style="display:none;">
+  <label for="name" style="font-size:18px; font-weight:bold; color:#222; margin-right:10px;">
+    ✍️ Enter Your Name for Your Certificate:
+  </label>
+  <input type="text" id="name" placeholder="Type your full name here...">
+  <button onclick="submitName()">Submit</button>
+</div>
+
+<div id="result"></div>
+<div id="certificateWrapper">
+  <div id="certificate"></div>
+</div>
+<button id="downloadBtn" style="display:none;" onclick="downloadPNG()">Download Certificate</button>
+
+<script>
+const wordBank = `The quick brown fox jumps over the lazy dog typing helps you improve speed and accuracy with practice technology is evolving rapidly learning to type faster saves time and boosts productivity success comes with consistent practice a typing test measures both your speed and accuracy effectively programming requires focus and precision fast typing allows you to write code and debug more efficiently education in the digital age demands strong typing skills the more you type the better you communicate dedication discipline and regular effort are the keys to mastering typing speed confidence grows as your skills improve accuracy is as important as speed a good balance leads to professional excellence`.split(" ");
+
+let words = [];
+let seconds = 60;
+let interval;
+let started = false;
+let wpm = 0;
+
+const textContainer = document.getElementById("text");
+const input = document.getElementById("input");
+
+input.addEventListener("input", checkTyping);
+
+function loadPassage() {
+  let randomWords = [];
+  for (let i = 0; i < 100; i++) {
+    randomWords.push(wordBank[Math.floor(Math.random() * wordBank.length)]);
+  }
+  words = randomWords;
+  textContainer.innerHTML = words.map(w => `<span>${w}</span>`).join(" ");
+}
+
+function checkTyping() {
+  let typed = input.value.trim().split(/\s+/);
+  let spans = textContainer.querySelectorAll("span");
+  spans.forEach((span, i) => {
+    if (typed[i] == null) {
+      span.className = "";
+    } else if (typed[i] === words[i]) {
+      span.className = "correct";
+    } else {
+      span.className = "wrong";
+    }
+  });
+
+  let currentWordIndex = typed.length - 1;
+  if (currentWordIndex >= 0) {
+    let currentSpan = spans[currentWordIndex];
+    if (currentSpan) {
+      currentSpan.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+}
+
+function startTest() {
+  if (started) return;
+  started = true;
+  loadPassage();
+  input.disabled = false;
+  input.value = "";
+  input.focus();
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("certificate").style.display = "none";
+  document.getElementById("downloadBtn").style.display = "none";
+  document.getElementById("inputname").style.display = "none";
+  seconds = 60; 
+  document.getElementById("timer").innerHTML = seconds;
+
+  interval = setInterval(function() {
+    document.getElementById("timer").innerHTML = seconds;
+    seconds--;
+    if (seconds < 0) {
+      clearInterval(interval);
+      finishTest();
+    }
+  }, 1000);
+}
+
+function finishTest() {
+  input.disabled = true;
+  let typed = input.value.trim().split(/\s+/).filter(w => w.length > 0);
+  let correct = 0;
+  typed.forEach((w, i) => {
+    if (w === words[i]) correct++;
+  });
+  wpm = correct;
+
+  document.getElementById("result").innerHTML =
+    "⏱️ Time's up!<br>You typed <b>" + typed.length + "</b> words.<br>" +
+    "Correct words: <b>" + correct + "</b><br>" +
+    "Your speed is <b>" + wpm + " WPM</b>.";
+
+  document.getElementById("inputname").style.display = "block";
+}
+
+function submitName() {
+  let name = document.getElementById("name").value.trim();
+  if (!name) {
+    alert("Please enter your name!");
+    return;
+  }
+
+  let now = new Date();
+  let issuedDate = now.toLocaleDateString();
+
+  let cert = document.getElementById("certificate");
+  cert.innerHTML = 
+    "<div class='cert-watermark'>" +
+      "<img src='https://i.ibb.co/JFbFZPY6/20250902-184151.jpg' alt='Watermark'>" +
+    "</div>" +
+    "<div id='imgborder'><img src='https://i.ibb.co/4nPc8m4p/20250904-104329.png' alt='Border'></div>"+
+    "<div class='cert-icon'>🏆</div>" +
+    "<h3>Certificate of Achievement</h3>" +
+    "<p>This certifies that</p>" +
+    "<h2>" + name + "</h2>" +
+    "<p>achieved a typing speed of <b>" + wpm + " WPM</b><br>in the typing test.</p>" +
+    "<p class='issued-date'><span>Issued on:</span> <b>" + issuedDate +  "</b></p>" +
+    "<div class='cert-footer'>" +
+      "<div class='cert-authimg'>" +
+        "<img src='https://i.ibb.co/JRvpqRPK/20250902-190740.png' alt='Seal'>" +
+        "<div class='site-name'>TypingTestPro.com</div>" +
+      "</div>" +
+      "<div class='signature'>" +
+        "<img src='https://i.ibb.co/ch2hB13p/signature.png' crossorigin='anonymous' alt='Signature'><br>" +
+        "<span>Authorized Signature</span>" +
+      "</div>" +
+    "</div>";
+
+  cert.style.display = "block";
+  document.getElementById("downloadBtn").style.display = "inline-block";
+  document.getElementById("inputname").style.display = "none";
+}
+
+async function downloadPNG() {
+  const cert = document.getElementById("certificate");
+  const canvas = await html2canvas(cert, {
+    scale: 3,
+    useCORS: true,
+    width: 950,
+    height: 700
+  });
+  const link = document.createElement("a");
+  link.download = "Typing_Certificate.png";
+  link.href = canvas.toDataURL("image/png", 1.0);
+  link.click();
+}
+</script>
+</body>
+</html>
